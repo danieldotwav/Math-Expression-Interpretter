@@ -3,7 +3,9 @@
 
 #define INVALID_OPERATOR 'X'
 
+/* Helper Functions */
 int isDigit(int ch);
+int isSpace(int ch);
 char getOperatorType(int ch);
 
 /* Wrapper function */
@@ -18,14 +20,9 @@ int modulo(int left_operand, int right_operand);
 
 int main(void) {
 	int iochar;
-
 	int left_operand = 0;
 	int right_operand = 0;
 	char operator_symbol = INVALID_OPERATOR;
-
-	// Demonstrate predefined functions
-	printf("%d\n", add(5, 10));
-	printf("%.2f\n", divide(10, 5));
 
 	while ((iochar = getchar()) != EOF) {
 		// Reset operands and operator for each new expression
