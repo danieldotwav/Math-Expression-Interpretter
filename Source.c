@@ -7,85 +7,68 @@ int isDigit(int ch);
 char getOperatorType(int ch);
 
 /* Wrapper function */
-void computeOperation(int left_operand, int right_operand, char operator_symbol);
+void performSpecifiedOperation(int left_operand, int right_operand, char operator_symbol);
 
-int performAddition(int left_operand, int right_operand);
-int performSubtraction(int left_operand, int right_operand);
-int performMultiplication(int left_operand, int right_operand);
-float performDivision(int left_operand, int right_operand);
-int performModulo(int left_operand, int right_operand);
+/* Individual Operation Functions */
+int add(int left_operand, int right_operand);
+int subtract(int left_operand, int right_operand);
+int multiply(int left_operand, int right_operand);
+float divide(int left_operand, int right_operand);
+int modulo(int left_operand, int right_operand);
 
 int main(void) {
 	int iochar;
-	
-	int is_valid_left_operand = 0;
-	int is_valid_right_operand = 0;
-
-	int is_valid_operator = 1;
-	int is_valid_expression = 1;
-
-	printf("%d", performAddition(5, 10));
-	printf("\n");
-	printf("%.2f", performDivision(10, 5));
-	printf("\n");
-
-	printf("%c", getOperatorType('+', 0));
 
 	int left_operand = 0;
 	int right_operand = 0;
-	char user_operator = 0;
+	char operator_symbol = INVALID_OPERATOR;
 
-	int white_space_encountered = 0;
-	int still_processing_left_operand = 1;
-	int still_processing_right_operand = 1;
-		
-	/* First, we'll consider all characters up to the newline character as being part of the same expression */
-	while (iochar != EOF) {
-		/* First, process left operand */
-		if (still_processing_left_operand) {
-			/* Once we encounter a non-numeric value, we can move on */
-			if (!isDigit(iochar)) {
-				still_processing_left_operand = 0;
-			}
-			else {
-				TODO: /* Form the number here */
-			}
+	// Demonstrate predefined functions
+	printf("%d\n", add(5, 10));
+	printf("%.2f\n", divide(10, 5));
+
+	while ((iochar = getchar()) != EOF) {
+		// Reset operands and operator for each new expression
+		left_operand = 0;
+		right_operand = 0;
+		operator_symbol = INVALID_OPERATOR;
+
+		// Process left operand and skip initial whitespace
+		while (isSpace(iochar)) { iochar = getchar(); } // Skip leading spaces
+
+		while (isDigit(iochar)) {
+			left_operand = left_operand * 10 + (iochar - '0');
+			iochar = getchar();
 		}
 
-		/* Next, we will check for a valid operator symbol */
-		char operator_symbol;
-		if (is_valid_left_operand && is_valid_expression) {
-			while ((iochar = getchar() == ' ')) { /* consume white spaces leading to next input */ }
+		// Skip whitespace before operator
+		while (isSpace(iochar)) { iochar = getchar(); }
 
-			/* Validate operator */
-			operator_symbol = getOperatorType(iochar);
-
-			if (operator_symbol == INVALID_OPERATOR) {
-				is_valid_expression = 0;
-			}
-		}
-
-		/* Finally, we check for a valid right operand */
-		if (still_processing_right_operand && is_valid_expression) {
-			if (!isDigit(iochar)) {
-				/* Once we encounter a non-numeric value, we can move on */
-				still_processing_right_operand = 0;
-			} 
-			else {
-				TODO: /* Form the number here */
-			}
-		}
-
-		/* Consume all whitespaces following right operand */
-		while ((iochar = getchar()) == ' ') {  }
-
-		/* If all that's left is a newline character, then the expression is valid */
-		if (iochar == '\n') {
-			computeOperation(left_operand, right_operand, operator_symbol);
+		// Validate and set operator
+		operator_symbol = getOperatorType(iochar);
+		if (operator_symbol == INVALID_OPERATOR) {
+			// Skip to the end of the current line to avoid processing the rest of it
+			printf("Error: Invalid Operator\n");
+			while ((iochar = getchar()) != '\n' && iochar != EOF);
 		}
 		else {
-			/* Otherwise, consume all characters until we reach a newline or EOF */
-			while ((iochar = getchar()) != EOF && iochar != '\n') {  }
+			// Get next character which could be the start of the right operand or whitespace
+			iochar = getchar();
+
+			// Skip whitespace before right operand
+			while (isSpace(iochar)) { iochar = getchar(); }
+
+			// Process right operand
+			while (isDigit(iochar)) {
+				right_operand = right_operand * 10 + (iochar - '0');
+				iochar = getchar();
+			}
+
+			// Assuming computeOperation does something meaningful with the operands and operator
+			performSpecifiedOperation(left_operand, right_operand, operator_symbol);
+
+			// Skip to the end of the line or file to handle the next expression cleanly
+			while (iochar != '\n' && iochar != EOF) { iochar = getchar(); }
 		}
 	}
 
@@ -94,6 +77,10 @@ int main(void) {
 
 int isDigit(int ch) {
 	return (ch >= '0' && ch <= '9');
+}
+
+int isSpace(int ch) {
+	return (ch == ' ');
 }
 
 char getOperatorType(int ch) {
@@ -115,27 +102,27 @@ char getOperatorType(int ch) {
 	return ch;
 }
 
-void computeOperation(int left_operand, int right_operand, char operator_symbol) {
+void performSpecifiedOperation(int left_operand, int right_operand, char operator_symbol) {
 	int whole_num_val = 0;
 	float decimal_val = 0;
 	int is_division = 0;
 
 	switch (operator_symbol) {
 		case '+':
-			whole_num_val = performAddition(left_operand, right_operand);
+			whole_num_val = add(left_operand, right_operand);
 			break;
 		case '-':
-			whole_num_val = performSubtraction(left_operand, right_operand);
+			whole_num_val = subtract(left_operand, right_operand);
 			break;
 		case '*':
-			whole_num_val = performMultiplication(left_operand, right_operand);
+			whole_num_val = multiply(left_operand, right_operand);
 			break;
 		case '/':
-			decimal_val = performDivision(left_operand, right_operand);
+			decimal_val = divide(left_operand, right_operand);
 			is_division = 1;
 			break;
 		case '%':
-			whole_num_val = performModulo(left_operand, right_operand);
+			whole_num_val = modulo(left_operand, right_operand);
 			break;
 		default:
 			printf("\nError: Unable to determine operation type\n");
@@ -152,22 +139,22 @@ void computeOperation(int left_operand, int right_operand, char operator_symbol)
 	}
 }
 
-int performAddition(int left_operand, int right_operand) {
+int add(int left_operand, int right_operand) {
 	return left_operand + right_operand;
 }
 
-int performSubtraction(int left_operand, int right_operand) {
+int subtract(int left_operand, int right_operand) {
 	return left_operand - right_operand;
 }
 
-int performMultiplication(int left_operand, int right_operand) {
+int multiply(int left_operand, int right_operand) {
 	return left_operand * right_operand;
 }
 
-float performDivision(int left_operand, int right_operand) {
+float divide(int left_operand, int right_operand) {
 	return ((float) left_operand / right_operand);
 }
 
-int performModulo(int left_operand, int right_operand) {
+int modulo(int left_operand, int right_operand) {
 	return left_operand % right_operand;
 }
