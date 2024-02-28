@@ -24,9 +24,13 @@ int main(void) {
 	int left_operand = 0;
 	int right_operand = 0;
 	char operator_symbol = INVALID_OPERATOR;
+
+	/* Program flags */
 	int left_operand_found = 0; /* Flag to check if left operand is found */
 	int right_operand_found = 0; /* Flag to check if right operand is found */
 	int negative_flag = 0; /* Flag to identify negative operands */
+	int division_flag = 0; /* Flag to perform additional operand checks */
+	int extraneous_data_flag = 0; /* Flag that checks for additional data following right_operand */
 
 	printf("---- Expression Interpretter ----\n");
 	char user_selection = 'Y';
@@ -35,12 +39,8 @@ int main(void) {
 
 	while (((iochar = getchar()) != EOF) && (user_selection == 'Y' || user_selection == 'y')) {
 		/* Reset operands, operator, and flags for each new expression */
-		left_operand = 0;
-		right_operand = 0;
+		left_operand = right_operand = left_operand_found = right_operand_found = negative_flag = division_flag = extraneous_data_flag = 0;
 		operator_symbol = INVALID_OPERATOR;
-		left_operand_found = 0;
-		right_operand_found = 0;
-		negative_flag = 0;
 
 		/* Process left operand and skip initial whitespace */
 		while (isSpace(iochar)) { iochar = getchar(); }
@@ -75,6 +75,9 @@ int main(void) {
 				printf("\nError: Invalid Operator - '%c' Is Not A Valid Operator\n", iochar);
 			}
 			else {
+				/* Check the valid operator for any type of division */
+				division_flag = (operator_symbol == '/' || operator_symbol == '%') ? 1 : 0;
+
 				/* Get next character which could be the start of the right operand or whitespace */
 				iochar = getchar();
 
@@ -94,17 +97,27 @@ int main(void) {
 					iochar = getchar();
 				}
 
-				if (!right_operand_found) {
+				/* Consume whitespaces following right operand */
+				while (isSpace(iochar)) { iochar = getchar(); }
+
+				/* Check for extraneous data */
+				extraneous_data_flag = (iochar == '\n') ? 0 : 1;
+
+				/* Once we have extracted the right operand, we need to perform the following checks */
+				if (extraneous_data_flag) {
+					printf("\nError: Invalid Expression Format - Extraneous Characters\n");
+				}
+				else if (!right_operand_found) {
 					printf("\nError: Invalid Expression Format - Missing Right Operand\n");
 				}
 				else if (right_operand_found && negative_flag) {
 					printf("\nError: Invalid Right Operand - Negative Numbers Cannot Be Processed\n");
 				}
+				else if (right_operand_found && division_flag && right_operand == 0) {
+					printf("\nError: Invalid Right Operand - Division By Zero Is Not Allowed\n");
+				}
 				else if ((iochar == '\n' || iochar == EOF) && right_operand_found) {
 					performSpecifiedOperation(left_operand, right_operand, operator_symbol);
-				}
-				else {
-					printf("\nError: Invalid Expression Format - Extraneous Characters\n");
 				}
 			}
 		}
@@ -178,6 +191,7 @@ void performSpecifiedOperation(int left_operand, int right_operand, char operato
 	float decimal_val = 0;
 	int division_flag = 0;
 
+	/* When performing division or modulo, the operands have additional restrictions */
 	switch (operator_symbol) {
 		case '+':
 			whole_num_val = add(left_operand, right_operand);
