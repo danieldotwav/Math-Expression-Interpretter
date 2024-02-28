@@ -55,11 +55,9 @@ int main(void) {
 		/* We only continue to process the expression if the operand is positive */
 		if (!left_operand_found) {
 			printf("Error: Invalid Expression Format - Missing Left Operand\n");
-			while (iochar != '\n' && iochar != EOF) { iochar = getchar(); }
 		}
 		else if (left_operand_found && negative_flag) {
 			printf("Error: Invalid Left Operand - Negative Numbers Cannot Be Processed\n");
-			while (iochar != '\n' && iochar != EOF) { iochar = getchar(); }
 		}
 		else {
 			/* Skip whitespace before operator */
@@ -69,7 +67,6 @@ int main(void) {
 			operator_symbol = getOperatorType(iochar);
 			if (operator_symbol == INVALID_OPERATOR) {
 				printf("Error: Invalid Operator - '%c' Is Not A Valid Operator\n", iochar);
-				while (iochar != '\n' && iochar != EOF) { iochar = getchar(); }
 			}
 			else {
 				/* Get next character which could be the start of the right operand or whitespace */
@@ -96,7 +93,6 @@ int main(void) {
 				}
 				else if (right_operand_found && negative_flag) {
 					printf("Error: Invalid Right Operand - Negative Numbers Cannot Be Processed\n");
-					while (iochar != '\n' && iochar != EOF) { iochar = getchar(); }
 				}
 				else if ((iochar == '\n' || iochar == EOF) && right_operand_found) {
 					performSpecifiedOperation(left_operand, right_operand, operator_symbol);
@@ -104,11 +100,10 @@ int main(void) {
 				else {
 					printf("Error: Invalid Expression Format - Extraneous Characters\n");
 				}
-
-				/* Skip any remaining characters until the end of the line or file */
-				while (iochar != '\n' && iochar != EOF) { iochar = getchar(); }
 			}
 		}
+		/* Skip any remaining characters until the end of the line or file */
+		while (iochar != '\n' && iochar != EOF) { iochar = getchar(); }
 	}
 
 	return 0;
@@ -150,7 +145,7 @@ char getOperatorType(int ch) {
 void performSpecifiedOperation(int left_operand, int right_operand, char operator_symbol) {
 	int whole_num_val = 0;
 	float decimal_val = 0;
-	int is_division = 0;
+	int division_flag = 0;
 
 	switch (operator_symbol) {
 		case '+':
@@ -164,7 +159,7 @@ void performSpecifiedOperation(int left_operand, int right_operand, char operato
 			break;
 		case '/':
 			decimal_val = divide(left_operand, right_operand);
-			is_division = 1;
+			division_flag = 1;
 			break;
 		case '%':
 			whole_num_val = modulo(left_operand, right_operand);
@@ -176,7 +171,7 @@ void performSpecifiedOperation(int left_operand, int right_operand, char operato
 
 	/* Print the operation and result */
 	printf("%d %c %d = ", left_operand, operator_symbol, right_operand);
-	if (is_division) {
+	if (division_flag) {
 		printf("%.2f\n", decimal_val);
 	}
 	else {
