@@ -22,4 +22,7 @@
   <ItemGroup>
     <Text Include="x64\Debug\input.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" />
+  </ItemGroup>
 </Project>
