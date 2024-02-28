@@ -7,7 +7,6 @@
 int isDigit(int ch);
 int isSpace(int ch);
 char getOperatorType(int ch);
-void printIntWithPutchar(int num);
 
 /* Wrapper function */
 void performSpecifiedOperation(int left_operand, int right_operand, char operator_symbol);
@@ -24,59 +23,91 @@ int main(void) {
 	int left_operand = 0;
 	int right_operand = 0;
 	char operator_symbol = INVALID_OPERATOR;
+	int left_operand_found = 0; /* Flag to check if left operand is found */
+	int right_operand_found = 0; /* Flag to check if right operand is found */
+	int negative_flag = 0; /* Flag to identify negative operands */
 
 	while ((iochar = getchar()) != EOF) {
-		// Reset operands and operator for each new expression
+		/* Reset operands, operator, and flags for each new expression */
 		left_operand = 0;
 		right_operand = 0;
 		operator_symbol = INVALID_OPERATOR;
+		left_operand_found = 0;
+		right_operand_found = 0;
+		negative_flag = 0;
 
-		// Process left operand and skip initial whitespace
-		while (isSpace(iochar)) { iochar = getchar(); } // Skip leading spaces
+		/* Process left operand and skip initial whitespace */
+		while (isSpace(iochar)) { iochar = getchar(); }
 
-		/* Convert the character representation of a number to an integer */
+		/* Check for negative sign for left operand */
+		if (iochar == '-') {
+			negative_flag = 1;
+			iochar = getchar();
+		}
+
+		/* Convert the number string to its integer representation */
 		while (isDigit(iochar)) {
+			left_operand_found = 1;
 			left_operand = left_operand * 10 + (iochar - '0');
 			iochar = getchar();
 		}
 
-		// Skip whitespace before operator
-		while (isSpace(iochar)) { iochar = getchar(); }
-
-		// Validate and set operator
-		operator_symbol = getOperatorType(iochar);
-		if (operator_symbol == INVALID_OPERATOR) {
-			// Skip to the end of the current line to avoid processing the rest of it
-			printf("Error: Invalid Operator\n");
-			while ((iochar = getchar()) != '\n' && iochar != EOF);
+		/* We only continue to process the expression if the operand is positive */
+		if (!left_operand_found) {
+			printf("Error: Invalid Expression Format - Missing Left Operand\n");
+			while (iochar != '\n' && iochar != EOF) { iochar = getchar(); }
+		}
+		else if (left_operand_found && negative_flag) {
+			printf("Error: Invalid Left Operand - Negative Numbers Cannot Be Processed\n");
+			while (iochar != '\n' && iochar != EOF) { iochar = getchar(); }
 		}
 		else {
-			// Get next character which could be the start of the right operand or whitespace
-			iochar = getchar();
-
-			// Skip whitespace before right operand
+			/* Skip whitespace before operator */
 			while (isSpace(iochar)) { iochar = getchar(); }
 
-			// Process right operand
-			while (isDigit(iochar)) {
-				right_operand = right_operand * 10 + (iochar - '0');
-				iochar = getchar();
-			}
-
-			// Skip potential whitespace after right operand
-			while (isSpace(iochar)) { iochar = getchar(); }
-
-			// The expression is valid if the next character is a newline or EOF
-			if (iochar == '\n' || iochar == EOF) {
-				performSpecifiedOperation(left_operand, right_operand, operator_symbol);
+			/* Validate and set operator */
+			operator_symbol = getOperatorType(iochar);
+			if (operator_symbol == INVALID_OPERATOR) {
+				printf("Error: Invalid Operator - '%c' Is Not A Valid Operator\n", iochar);
+				while (iochar != '\n' && iochar != EOF) { iochar = getchar(); }
 			}
 			else {
-				// If the next character is not a newline or EOF, it's an invalid expression
-				printf("Error: Invalid expression format\n");
-			}
+				/* Get next character which could be the start of the right operand or whitespace */
+				iochar = getchar();
 
-			// Skip any remaining characters until the end of the line or file
-			while (iochar != '\n' && iochar != EOF) { iochar = getchar(); }
+				/* Skip whitespace before right operand */
+				while (isSpace(iochar)) { iochar = getchar(); }
+
+				/* Check for negative sign for right operand */
+				if (iochar == '-') {
+					negative_flag = 1;
+					iochar = getchar();
+				}
+
+				/* Convert the characters to an integer */
+				while (isDigit(iochar)) {
+					right_operand_found = 1;
+					right_operand = right_operand * 10 + (iochar - '0');
+					iochar = getchar();
+				}
+
+				if (!right_operand_found) {
+					printf("Error: Invalid Expression Format - Missing Right Operand\n");
+				}
+				else if (right_operand_found && negative_flag) {
+					printf("Error: Invalid Right Operand - Negative Numbers Cannot Be Processed\n");
+					while (iochar != '\n' && iochar != EOF) { iochar = getchar(); }
+				}
+				else if ((iochar == '\n' || iochar == EOF) && right_operand_found) {
+					performSpecifiedOperation(left_operand, right_operand, operator_symbol);
+				}
+				else {
+					printf("Error: Invalid Expression Format - Extraneous Characters\n");
+				}
+
+				/* Skip any remaining characters until the end of the line or file */
+				while (iochar != '\n' && iochar != EOF) { iochar = getchar(); }
+			}
 		}
 	}
 
@@ -151,15 +182,6 @@ void performSpecifiedOperation(int left_operand, int right_operand, char operato
 	else {
 		printf("%d\n", whole_num_val);
 	}
-}
-
-void printIntWithPutchar(int num) {
-	if (num / 10) {
-		/* Call function recursively to print each digit */
-		printIntWithPutchar(num / 10);
-	}
-	/* Convert the last digit to a char and print */
-	putchar(num % 10 + '0'); 
 }
 
 int add(int left_operand, int right_operand) {
