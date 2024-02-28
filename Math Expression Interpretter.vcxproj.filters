@@ -19,4 +19,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="x64\Debug\input.txt" />
+  </ItemGroup>
 </Project>

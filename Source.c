@@ -1,12 +1,13 @@
 #define _CRT_SECURE_NO_WARNINGS /* Disable security warnings in Microsoft Visual Studio */
 #include <stdio.h>
 
-#define INVALID_OPERATOR 'X'
+#define INVALID_OPERATOR '\0'
 
 /* Helper Functions */
 int isDigit(int ch);
 int isSpace(int ch);
 char getOperatorType(int ch);
+void printIntWithPutchar(int num);
 
 /* Wrapper function */
 void performSpecifiedOperation(int left_operand, int right_operand, char operator_symbol);
@@ -33,6 +34,7 @@ int main(void) {
 		// Process left operand and skip initial whitespace
 		while (isSpace(iochar)) { iochar = getchar(); } // Skip leading spaces
 
+		/* Convert the character representation of a number to an integer */
 		while (isDigit(iochar)) {
 			left_operand = left_operand * 10 + (iochar - '0');
 			iochar = getchar();
@@ -61,10 +63,19 @@ int main(void) {
 				iochar = getchar();
 			}
 
-			// Assuming computeOperation does something meaningful with the operands and operator
-			performSpecifiedOperation(left_operand, right_operand, operator_symbol);
+			// Skip potential whitespace after right operand
+			while (isSpace(iochar)) { iochar = getchar(); }
 
-			// Skip to the end of the line or file to handle the next expression cleanly
+			// The expression is valid if the next character is a newline or EOF
+			if (iochar == '\n' || iochar == EOF) {
+				performSpecifiedOperation(left_operand, right_operand, operator_symbol);
+			}
+			else {
+				// If the next character is not a newline or EOF, it's an invalid expression
+				printf("Error: Invalid expression format\n");
+			}
+
+			// Skip any remaining characters until the end of the line or file
 			while (iochar != '\n' && iochar != EOF) { iochar = getchar(); }
 		}
 	}
@@ -77,26 +88,32 @@ int isDigit(int ch) {
 }
 
 int isSpace(int ch) {
-	return (ch == ' ');
+	return (ch == ' ' || ch == '\t');
 }
 
 char getOperatorType(int ch) {
+	char operator_type;
 	switch (ch) {
 		case '+':
+			operator_type = '+';
 			break;
 		case '-':
+			operator_type = '-';
 			break;
 		case '*':
+			operator_type = '*';
 			break;
 		case '/':
+			operator_type = '/';
 			break;
 		case '%':
+			operator_type = '%';
 			break;
 		default:
-			ch = INVALID_OPERATOR;
+			operator_type = INVALID_OPERATOR;
 			break;
 	}
-	return ch;
+	return operator_type;
 }
 
 void performSpecifiedOperation(int left_operand, int right_operand, char operator_symbol) {
@@ -134,6 +151,15 @@ void performSpecifiedOperation(int left_operand, int right_operand, char operato
 	else {
 		printf("%d\n", whole_num_val);
 	}
+}
+
+void printIntWithPutchar(int num) {
+	if (num / 10) {
+		/* Call function recursively to print each digit */
+		printIntWithPutchar(num / 10);
+	}
+	/* Convert the last digit to a char and print */
+	putchar(num % 10 + '0'); 
 }
 
 int add(int left_operand, int right_operand) {
