@@ -189,7 +189,7 @@ char getUserSelection() {
 void performSpecifiedOperation(int left_operand, int right_operand, char operator_symbol) {
 	int whole_num_val = 0;
 	float decimal_val = 0;
-	int division_flag = 0;
+	int is_float = 0;
 
 	/* When performing division or modulo, the operands have additional restrictions */
 	switch (operator_symbol) {
@@ -204,7 +204,7 @@ void performSpecifiedOperation(int left_operand, int right_operand, char operato
 			break;
 		case '/':
 			decimal_val = divide(left_operand, right_operand);
-			division_flag = 1;
+			is_float = 1;
 			break;
 		case '%':
 			whole_num_val = modulo(left_operand, right_operand);
@@ -216,7 +216,7 @@ void performSpecifiedOperation(int left_operand, int right_operand, char operato
 
 	/* Print the operation and result */
 	printf("%d %c %d = ", left_operand, operator_symbol, right_operand);
-	if (division_flag) {
+	if (is_float) {
 		printf("%.2f\n", decimal_val);
 	}
 	else {

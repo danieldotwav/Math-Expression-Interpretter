@@ -26,10 +26,16 @@ This C program acts as a simple calculator that performs basic arithmetic operat
 
 ## Error Handling
 
-The program includes basic error handling for various scenarios, such as invalid expressions, unsupported operators, and negative numbers. It ensures that each expression is properly formatted and that all numbers involved in the operations are non-negative.
+The program now includes advanced error handling mechanisms for:
+
+- Invalid expressions (missing operands or operators).
+- Unsupported operators.
+- Negative numbers as operands.
+- Division by zero.
+- Extraneous characters after the right operand.
 
 ## Limitations
 
-- **Negative Numbers:** The current implementation does not support negative numbers as operands.
+- **Negative Numbers:** The current implementation does not support negative numbers as operands. Negative numbers may be printed as results, however (e.g., 5 - 10 = -5).
 - **Floating-Point Numbers:** It does not support floating-point numbers; all operands are treated as integers except for the division operation, which returns a floating-point result.
 - **Input Format:** Each expression must be in the form of `operand1 operator operand2` (e.g., `10 + 20`), with each component separated by whitespace.
