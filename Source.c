@@ -243,3 +243,41 @@ float divide(int left_operand, int right_operand) {
 int modulo(int left_operand, int right_operand) {
 	return left_operand % right_operand;
 }
+
+
+/*
+
+Test Cases
+
+5+3
+y
+	6	*2
+y
+	 108   %    6
+y
+1-  	100
+y
+45 +
+y
+-5 /4
+y
+78 ^3
+y
+  %  	89
+y
+1 0 8 % 6
+y
+856  -5 2
+y
+4/ -3
+y
+1 /0
+y
+1%0
+U
+y
+62 * 91
+n
+
+
+*/
