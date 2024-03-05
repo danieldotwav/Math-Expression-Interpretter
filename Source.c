@@ -38,17 +38,22 @@ int main(void) {
 	printf("\nEnter an expression in the form of: A <operator> B\n");
 
 	while (((iochar = getchar()) != EOF) && (user_selection == 'Y' || user_selection == 'y')) {
+		putchar(iochar);
 		/* Reset operands, operator, and flags for each new expression */
 		left_operand = right_operand = left_operand_found = right_operand_found = negative_flag = division_flag = extraneous_data_flag = 0;
 		operator_symbol = INVALID_OPERATOR;
 
 		/* Process left operand and skip initial whitespace */
-		while (isSpace(iochar)) { iochar = getchar(); }
+		while (isSpace(iochar)) { 
+			iochar = getchar();
+			putchar(iochar);
+		}
 
 		/* Check for negative sign for left operand */
 		if (iochar == '-') {
 			negative_flag = 1;
 			iochar = getchar();
+			putchar(iochar);
 		}
 
 		/* Convert the number string to its integer representation */
@@ -56,6 +61,7 @@ int main(void) {
 			left_operand_found = 1;
 			left_operand = left_operand * 10 + (iochar - '0');
 			iochar = getchar();
+			putchar(iochar);
 		}
 
 		/* We only continue to process the expression if the operand is positive */
@@ -67,7 +73,10 @@ int main(void) {
 		}
 		else {
 			/* Skip whitespace before operator */
-			while (isSpace(iochar)) { iochar = getchar(); }
+			while (isSpace(iochar)) { 
+				iochar = getchar();
+				putchar(iochar);
+			}
 
 			/* Validate and set operator */
 			operator_symbol = getOperatorType(iochar);
@@ -80,14 +89,19 @@ int main(void) {
 
 				/* Get next character which could be the start of the right operand or whitespace */
 				iochar = getchar();
+				putchar(iochar);
 
 				/* Skip whitespace before right operand */
-				while (isSpace(iochar)) { iochar = getchar(); }
+				while (isSpace(iochar)) { 
+					iochar = getchar();
+					putchar(iochar);
+				}
 
 				/* Check for negative sign for right operand */
 				if (iochar == '-') {
 					negative_flag = 1;
 					iochar = getchar();
+					putchar(iochar);
 				}
 
 				/* Convert the characters to an integer */
@@ -95,10 +109,14 @@ int main(void) {
 					right_operand_found = 1;
 					right_operand = right_operand * 10 + (iochar - '0');
 					iochar = getchar();
+					putchar(iochar);
 				}
 
 				/* Consume whitespaces following right operand */
-				while (isSpace(iochar)) { iochar = getchar(); }
+				while (isSpace(iochar)) { 
+					iochar = getchar();
+					putchar(iochar);
+				}
 
 				/* Check for extraneous data */
 				extraneous_data_flag = (iochar == '\n') ? 0 : 1;
@@ -122,7 +140,10 @@ int main(void) {
 			}
 		}
 		/* Skip any remaining characters until the end of the line or file */
-		while (iochar != '\n' && iochar != EOF) { iochar = getchar(); }
+		while (iochar != '\n' && iochar != EOF) { 
+			iochar = getchar();
+			putchar(iochar);
+		}
 
 		/* Prompt user to repeat program */
 		user_selection = getUserSelection();
@@ -278,6 +299,5 @@ U
 y
 62 * 91
 n
-
 
 */
