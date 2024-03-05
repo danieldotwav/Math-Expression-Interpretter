@@ -109,7 +109,10 @@ int main(void) {
 					right_operand_found = 1;
 					right_operand = right_operand * 10 + (iochar - '0');
 					iochar = getchar();
-					putchar(iochar);
+					if (iochar != '\n') {
+						putchar(iochar);
+					}
+					/* putchar(iochar); */
 				}
 
 				/* Consume whitespaces following right operand */
@@ -197,11 +200,13 @@ char getUserSelection() {
 
 	printf("\nWould you like to run the program again?\nEnter 'Y' or 'N': ");
 	scanf(" %c", &user_selection);
+	putchar(user_selection);
 	
 	while (user_selection != 'Y' && user_selection != 'y' && user_selection != 'N' && user_selection != 'n') {
 		printf("\nError: Invalid Selection\nEnter 'Y' to restart the program and 'N' to exit: ");
 		while ((ch = getchar()) != '\n' && ch != EOF); /* Clear the input buffer */
 		scanf(" %c", &user_selection);
+		putchar(user_selection);
 	} 
 
 	return user_selection;
@@ -236,12 +241,11 @@ void performSpecifiedOperation(int left_operand, int right_operand, char operato
 	}
 
 	/* Print the operation and result */
-	printf("%d %c %d = ", left_operand, operator_symbol, right_operand);
 	if (is_float) {
-		printf("%.2f\n", decimal_val);
+		printf(" = %.2f\n", decimal_val);
 	}
 	else {
-		printf("%d\n", whole_num_val);
+		printf(" = %d\n", whole_num_val);
 	}
 }
 
