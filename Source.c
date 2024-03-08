@@ -8,6 +8,7 @@ int isDigit(int ch);
 int isSpace(int ch);
 char getOperatorType(int ch);
 char getUserSelection();
+void echoUntilNewLine(char ch);
 
 /* Wrapper function */
 void performSpecifiedOperation(int left_operand, int right_operand, char operator_symbol);
@@ -21,16 +22,15 @@ int modulo(int left_operand, int right_operand);
 
 int main(void) {
 	int iochar;
-	int left_operand = 0;
-	int right_operand = 0;
+	int left_operand, right_operand;
 	char operator_symbol = INVALID_OPERATOR;
 
 	/* Program flags */
-	int left_operand_found = 0; /* Flag to check if left operand is found */
-	int right_operand_found = 0; /* Flag to check if right operand is found */
-	int negative_flag = 0; /* Flag to identify negative operands */
-	int division_flag = 0; /* Flag to perform additional operand checks */
-	int extraneous_data_flag = 0; /* Flag that checks for additional data following right_operand */
+	int left_operand_found; /* Flag to check if left operand is found */
+	int right_operand_found; /* Flag to check if right operand is found */
+	int negative_flag; /* Flag to identify negative operands */
+	int division_flag; /* Flag to perform additional operand checks */
+	int extraneous_data_flag; /* Flag that checks for additional data following right_operand */
 
 	printf("---- Expression Interpretter ----\n");
 	char user_selection = 'Y';
@@ -38,10 +38,12 @@ int main(void) {
 	printf("\nEnter an expression in the form of: A <operator> B\n");
 
 	while (((iochar = getchar()) != EOF) && (user_selection == 'Y' || user_selection == 'y')) {
-		putchar(iochar);
 		/* Reset operands, operator, and flags for each new expression */
 		left_operand = right_operand = left_operand_found = right_operand_found = negative_flag = division_flag = extraneous_data_flag = 0;
 		operator_symbol = INVALID_OPERATOR;
+
+		/* Print current character to console */
+		putchar(iochar);
 
 		/* Process left operand and skip initial whitespace */
 		while (isSpace(iochar)) { 
@@ -66,9 +68,12 @@ int main(void) {
 
 		/* We only continue to process the expression if the operand is positive */
 		if (!left_operand_found) {
+			/* Read and print the rest of the line before printing error message */
+			echoUntilNewLine(iochar);
 			printf("\nError: Invalid Expression Format - Missing Left Operand\n");
 		}
 		else if (left_operand_found && negative_flag) {
+			echoUntilNewLine(iochar);
 			printf("\nError: Invalid Left Operand - Negative Numbers Cannot Be Processed\n");
 		}
 		else {
@@ -81,6 +86,7 @@ int main(void) {
 			/* Validate and set operator */
 			operator_symbol = getOperatorType(iochar);
 			if (operator_symbol == INVALID_OPERATOR) {
+				echoUntilNewLine(iochar);
 				printf("\nError: Invalid Operator - '%c' Is Not A Valid Operator\n", iochar);
 			}
 			else {
@@ -112,7 +118,6 @@ int main(void) {
 					if (iochar != '\n') {
 						putchar(iochar);
 					}
-					/* putchar(iochar); */
 				}
 
 				/* Consume whitespaces following right operand */
@@ -210,6 +215,13 @@ char getUserSelection() {
 	} 
 
 	return user_selection;
+}
+
+void echoUntilNewLine(char iochar) {
+	while (iochar != '\n' && iochar != EOF) {
+		iochar = getchar();
+		putchar(iochar);
+	}
 }
 
 void performSpecifiedOperation(int left_operand, int right_operand, char operator_symbol) {
