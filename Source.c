@@ -1,319 +1,279 @@
 #define _CRT_SECURE_NO_WARNINGS /* Disable security warnings in Microsoft Visual Studio */
 #include <stdio.h>
 
-#define INVALID_OPERATOR '\0'
+#define ADDITION '+'
+#define SUBTRACTION '-'
+#define MULTIPLICATION '*'
+#define DIVISION '/'
+#define MODULO '%'
 
-/* Helper Functions */
-int isDigit(int ch);
-int isSpace(int ch);
-char getOperatorType(int ch);
-char getUserSelection();
-void echoUntilNewLine(char ch);
+int isDigit(int iochar);
+int isSpace(int iochar);
+int isValidOperatorSymbol(int iochar);
 
-/* Wrapper function */
-void performSpecifiedOperation(int left_operand, int right_operand, char operator_symbol);
-
-/* Individual Operation Functions */
-int add(int left_operand, int right_operand);
-int subtract(int left_operand, int right_operand);
-int multiply(int left_operand, int right_operand);
-float divide(int left_operand, int right_operand);
+void performSpecifiedOperation(int left_operand, int right_operand, char operation);
+int addition(int left_operand, int right_operand);
+int subtraction(int left_operand, int right_operand);
+int multiplication(int left_operand, int right_operand);
+float division(int left_operand, int right_operand);
 int modulo(int left_operand, int right_operand);
+
+char promptUserToRepeatProgram(void);
 
 int main(void) {
 	int iochar;
-	int left_operand, right_operand;
-	char operator_symbol = INVALID_OPERATOR;
+	int left_operand, right_operand, negative_sign_encountered, negative_number_encountered, count;
+	char operation;
+	char response = 'y';
 
-	/* Program flags */
-	int left_operand_found; /* Flag to check if left operand is found */
-	int right_operand_found; /* Flag to check if right operand is found */
-	int negative_flag; /* Flag to identify negative operands */
-	int division_flag; /* Flag to perform additional operand checks */
-	int extraneous_data_flag; /* Flag that checks for additional data following right_operand */
+	printf("Welcome to the Math Expression Interpretter\n");
+	printf("Enter an expression in the form of: A <operator> B\n");
 
-	printf("---- Expression Interpretter ----\n");
-	char user_selection = 'Y';
-
-	printf("\nEnter an expression in the form of: A <operator> B\n");
-
-	while (((iochar = getchar()) != EOF) && (user_selection == 'Y' || user_selection == 'y')) {
-		/* Reset operands, operator, and flags for each new expression */
-		left_operand = right_operand = left_operand_found = right_operand_found = negative_flag = division_flag = extraneous_data_flag = 0;
-		operator_symbol = INVALID_OPERATOR;
+	while (((iochar = getchar()) != EOF) && (response == 'Y' || response == 'y')) {
+		/* Reset operands */
+		left_operand = right_operand = negative_sign_encountered = negative_number_encountered = count = 0;
+		operation = '\0';
 
 		/* Print current character to console */
 		putchar(iochar);
 
-		/* Process left operand and skip initial whitespace */
-		while (isSpace(iochar)) { 
+		/* Consume initial whitespaces */
+		while (isSpace(iochar)) {
 			iochar = getchar();
 			putchar(iochar);
 		}
 
-		/* Check for negative sign for left operand */
-		if (iochar == '-') {
-			negative_flag = 1;
-			iochar = getchar();
-			putchar(iochar);
-		}
-
-		/* Convert the number string to its integer representation */
-		while (isDigit(iochar)) {
-			left_operand_found = 1;
-			left_operand = left_operand * 10 + (iochar - '0');
-			iochar = getchar();
-			putchar(iochar);
-		}
-
-		/* We only continue to process the expression if the operand is positive */
-		if (!left_operand_found) {
-			/* Read and print the rest of the line before printing error message */
-			echoUntilNewLine(iochar);
-			printf("\nError: Invalid Expression Format - Missing Left Operand\n");
-		}
-		else if (left_operand_found && negative_flag) {
-			echoUntilNewLine(iochar);
-			printf("\nError: Invalid Left Operand - Negative Numbers Cannot Be Processed\n");
-		}
-		else {
-			/* Skip whitespace before operator */
-			while (isSpace(iochar)) { 
-				iochar = getchar();
-				putchar(iochar);
-			}
-
-			/* Validate and set operator */
-			operator_symbol = getOperatorType(iochar);
-			if (operator_symbol == INVALID_OPERATOR) {
-				echoUntilNewLine(iochar);
-				printf("\nError: Invalid Operator - '%c' Is Not A Valid Operator\n", iochar);
-			}
-			else {
-				/* Check the valid operator for any type of division */
-				division_flag = (operator_symbol == '/' || operator_symbol == '%') ? 1 : 0;
-
-				/* Get next character which could be the start of the right operand or whitespace */
-				iochar = getchar();
-				putchar(iochar);
-
-				/* Skip whitespace before right operand */
-				while (isSpace(iochar)) { 
-					iochar = getchar();
-					putchar(iochar);
-				}
-
-				/* Check for negative sign for right operand */
-				if (iochar == '-') {
-					negative_flag = 1;
-					iochar = getchar();
-					putchar(iochar);
-				}
-
-				/* Convert the characters to an integer */
+		/* Check if we've reached the end of the line */
+		if (iochar != '\n') {
+			if (isDigit(iochar)) {
+				/* We need to read every digit in the number */
 				while (isDigit(iochar)) {
-					right_operand_found = 1;
-					right_operand = right_operand * 10 + (iochar - '0');
+					/* Convert the character representation of the left_operand to an integer */
+					left_operand = left_operand * 10 + (iochar - '0');
 					iochar = getchar();
-					if (iochar != '\n') {
-						putchar(iochar);
+					putchar(iochar);
+				}
+
+				/* Consume whitespaces following left_operand */
+				while (isSpace(iochar)) {
+					iochar = getchar();
+					putchar(iochar);
+				}
+
+				/* Once again, we check if we've reached the end of the line */
+				if (iochar != '\n') {
+					if (isValidOperatorSymbol(iochar)) {
+						/* Now that we have a valid operation, we need to process the right operand*/
+						operation = iochar;
+
+						/* Consume whitespaces following operator symbol */
+						while (isSpace(iochar)) {
+							iochar = getchar();
+							putchar(iochar);
+						}
+
+						/* Check if we encounter a newline before reaching the right operand */
+						if (iochar != '\n') {
+							if (isDigit(iochar)) {
+								/* Convert the character representation of the right_operand to an integer */
+								while (isDigit(iochar)) {
+									right_operand = right_operand * 10 + (iochar - '0');
+									iochar = getchar();
+									putchar(iochar);
+								}
+
+								/* Consume whitespaces following right_operand */
+								while (isSpace(iochar)) {
+									iochar = getchar();
+									putchar(iochar);
+								}
+
+								/* Final check for newline character */
+								if (iochar == '\n' || iochar == EOF) {
+									/* If the only characters following the right_operand are tabs/spaces/newline characters/or EOF, then the expression is valid */
+									performSpecifiedOperation(left_operand, right_operand, operation);
+								}
+								else {
+									printf("Error: Invalid Expression Format\n");
+								}
+							}
+							else {
+								/* * * If we reach this part, the user entered an invalid right operand * * */
+								/* First, we check to see if the user entered a negative number */
+								if (iochar == '-') {
+									negative_sign_encountered = 1;
+								}
+
+								/* Read and print remaining input before printing the appropriate error message */
+								while (iochar != '\n' && iochar != EOF) {
+									iochar = getchar();
+									putchar(iochar);
+
+									/* If the first character following the negative sign is a digit, then we print a unique error message */
+									if (count == 0 && negative_sign_encountered && isDigit(iochar)) {
+										negative_number_encountered = 1;
+									}
+
+									count++;
+								}
+
+								if (negative_number_encountered) {
+									printf("Error: Negative Numbers Are Invalid\n");
+								}
+								else {
+									printf("Error: Invalid Character(s) Detected\n");
+								}
+							}
+						}
+						else {
+							/* If we reach this part, the user entered an incomplete expression */
+							printf("Error: Incomplete Expression\n");
+						}
+					}
+					else {
+						/* * * If we reach this part, the user entered an invalid operator symbol * * */
+						/* Consume remaining characters until the end of the line or file */
+						while (iochar != '\n' && iochar != EOF) {
+							iochar = getchar();
+							putchar(iochar);
+						}
+
+						printf("Error: Invalid Operator Symbol\n");
 					}
 				}
+				else {
+					/* * * If we reach this part, there's nothing left to process in the line * * */
+					printf("Error: Incomplete Expression\n");
+				}
+			}
+			else {
+				/* * * If we reach this part, the user entered an invalid left operand * * */
+				/* First, we check to see if the user entered a negative number */
+				if (iochar == '-') {
+					negative_sign_encountered = 1;
+				}
 
-				/* Consume whitespaces following right operand */
-				while (isSpace(iochar)) { 
+				/* Read and print remaining input before printing the appropriate error message */
+				while (iochar != '\n' && iochar != EOF) {
 					iochar = getchar();
 					putchar(iochar);
+
+					/* If the first character following the negative sign is a digit, then we print a unique error message */
+					if (count == 0 && negative_sign_encountered && isDigit(iochar)) {
+						negative_number_encountered = 1;
+					}
+
+					count++;
 				}
 
-				/* Check for extraneous data */
-				extraneous_data_flag = (iochar == '\n') ? 0 : 1;
-
-				/* Once we have extracted the right operand, we need to perform the following checks */
-				if (extraneous_data_flag) {
-					printf("\nError: Invalid Expression Format - Extraneous Characters\n");
+				if (negative_number_encountered) {
+					printf("Error: Negative Numbers Are Invalid\n");
 				}
-				else if (!right_operand_found) {
-					printf("\nError: Invalid Expression Format - Missing Right Operand\n");
-				}
-				else if (right_operand_found && negative_flag) {
-					printf("\nError: Invalid Right Operand - Negative Numbers Cannot Be Processed\n");
-				}
-				else if (right_operand_found && division_flag && right_operand == 0) {
-					printf("\nError: Invalid Right Operand - Division By Zero Is Not Allowed\n");
-				}
-				else if ((iochar == '\n' || iochar == EOF) && right_operand_found) {
-					performSpecifiedOperation(left_operand, right_operand, operator_symbol);
+				else {
+					printf("Error: Invalid Character(s) Detected\n");
 				}
 			}
 		}
-		/* Skip any remaining characters until the end of the line or file */
-		while (iochar != '\n' && iochar != EOF) { 
-			iochar = getchar();
-			putchar(iochar);
+		else {
+			/* * * If we reach this part, there's nothing left to process in the line */
+			printf("Error: Empty Line Encountered\n");
 		}
 
-		/* Prompt user to repeat program */
-		user_selection = getUserSelection();
-
-		/* Consume the newline character after the user makes a selection */
-		if (user_selection == 'Y' || user_selection == 'y') {
-			while ((iochar = getchar()) != '\n' && iochar != EOF);
-			printf("\nEnter an expression in the form of: A <operator> B\n"); 
-		}
+		/* Prompt user to repeat the program */
+		response = promptUserToRepeatProgram();
 	}
 
 	return 0;
 }
 
-int isDigit(int ch) {
-	return (ch >= '0' && ch <= '9');
+int isDigit(int iochar) {
+	return iochar >= '0' && iochar <= '9';
 }
 
-int isSpace(int ch) {
-	return (ch == ' ' || ch == '\t');
+int isSpace(int iochar) {
+	return iochar == ' ' || iochar == '\t';
 }
 
-char getOperatorType(int ch) {
-	char operator_type;
-	switch (ch) {
-		case '+':
-			operator_type = '+';
-			break;
-		case '-':
-			operator_type = '-';
-			break;
-		case '*':
-			operator_type = '*';
-			break;
-		case '/':
-			operator_type = '/';
-			break;
-		case '%':
-			operator_type = '%';
-			break;
-		default:
-			operator_type = INVALID_OPERATOR;
-			break;
-	}
-	return operator_type;
+int isValidOperatorSymbol(int iochar) {
+	return iochar == ADDITION || iochar == SUBTRACTION || iochar == MULTIPLICATION || iochar == DIVISION || iochar == MODULO;
 }
 
-char getUserSelection() {
-	int ch; /* Capture EOF */
-	char user_selection = '\0';
+void performSpecifiedOperation(int left_operand, int right_operand, char operation) {
+	int result = 0;
+	float result_float = 0.0;
 
-	printf("\nWould you like to run the program again?\nEnter 'Y' or 'N': ");
-	scanf(" %c", &user_selection);
-	putchar(user_selection);
-	
-	while (user_selection != 'Y' && user_selection != 'y' && user_selection != 'N' && user_selection != 'n') {
-		printf("\nError: Invalid Selection\nEnter 'Y' to restart the program and 'N' to exit: ");
-		while ((ch = getchar()) != '\n' && ch != EOF); /* Clear the input buffer */
-		scanf(" %c", &user_selection);
-		putchar(user_selection);
-	} 
-
-	return user_selection;
-}
-
-void echoUntilNewLine(char iochar) {
-	while (iochar != '\n' && iochar != EOF) {
-		iochar = getchar();
-		putchar(iochar);
-	}
-}
-
-void performSpecifiedOperation(int left_operand, int right_operand, char operator_symbol) {
-	int whole_num_val = 0;
-	float decimal_val = 0;
-	int is_float = 0;
-
-	/* When performing division or modulo, the operands have additional restrictions */
-	switch (operator_symbol) {
-		case '+':
-			whole_num_val = add(left_operand, right_operand);
-			break;
-		case '-':
-			whole_num_val = subtract(left_operand, right_operand);
-			break;
-		case '*':
-			whole_num_val = multiply(left_operand, right_operand);
-			break;
-		case '/':
-			decimal_val = divide(left_operand, right_operand);
-			is_float = 1;
-			break;
-		case '%':
-			whole_num_val = modulo(left_operand, right_operand);
-			break;
-		default:
-			printf("\nError: Unable to determine operation type\n");
-			break;
+	/* Determine which operation to perform */
+	switch (operation) {
+	case ADDITION:
+		result = addition(left_operand, right_operand);
+		break;
+	case SUBTRACTION:
+		result = subtraction(left_operand, right_operand);
+		break;
+	case MULTIPLICATION:
+		result = multiplication(left_operand, right_operand);
+		break;
+	case DIVISION:
+		result_float = division(left_operand, right_operand);
+		break;
+	case MODULO:
+		result = modulo(left_operand, right_operand);
+		break;
+	default:
+		printf("Error: Unable To Determine Operation Type\n");
+		break;
 	}
 
-	/* Print the operation and result */
-	if (is_float) {
-		printf(" = %.2f\n", decimal_val);
+	/* Print the result */
+	if (operation == DIVISION) {
+		printf("Result: %f\n", result_float);
 	}
 	else {
-		printf(" = %d\n", whole_num_val);
+		printf("Result: %d\n", result);
 	}
 }
 
-int add(int left_operand, int right_operand) {
+int addition(int left_operand, int right_operand) {
 	return left_operand + right_operand;
 }
 
-int subtract(int left_operand, int right_operand) {
+int subtraction(int left_operand, int right_operand) {
 	return left_operand - right_operand;
 }
 
-int multiply(int left_operand, int right_operand) {
+int multiplication(int left_operand, int right_operand) {
 	return left_operand * right_operand;
 }
 
-float divide(int left_operand, int right_operand) {
-	return ((float) left_operand / right_operand);
+float division(int left_operand, int right_operand) {
+	return left_operand / right_operand;
 }
 
 int modulo(int left_operand, int right_operand) {
 	return left_operand % right_operand;
 }
 
+char promptUserToRepeatProgram(void) {
+	char response;
+	int isValid;
+	int c; // Variable to read any extra characters
 
-/*
+	do {
+		isValid = 0; // Assume input is not valid initially
+		printf("Do you want to repeat the program? (y/n): ");
+		response = getchar(); // Read one character
 
-Test Cases
+		if (response == 'y' || response == 'Y' || response == 'n' || response == 'N') {
+			if (getchar() == '\n') { // Check if next character is newline
+				isValid = 1; // Input is valid
+			}
+		}
 
-5+3
-y
-	6	*2
-y
-	 108   %    6
-y
-1-  	100
-y
-45 +
-y
--5 /4
-y
-78 ^3
-y
-  %  	89
-y
-1 0 8 % 6
-y
-856  -5 2
-y
-4/ -3
-y
-1 /0
-y
-1%0
-U
-y
-62 * 91
-n
+		while (!isValid && (c = getchar()) != '\n' && c != EOF) {
+			// Flush the input buffer until newline or EOF
+		}
 
-*/
+	} while (!isValid || response == 'y' || response == 'Y');
+
+	return response;
+}
