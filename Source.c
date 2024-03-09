@@ -24,7 +24,7 @@ int main(void) {
 	int iochar;
 	int left_operand, right_operand, negative_sign_encountered, negative_number_encountered, count;
 	char operation;
-	char response = 'y';
+	char response = 'Y';
 
 	printf("Welcome to the Math Expression Interpretter\n");
 	printf("Enter an expression in the form of: A <operator> B\n");
@@ -73,13 +73,18 @@ int main(void) {
 						}
 
 						/* Check if we encounter a newline before reaching the right operand */
-						if (iochar != '\n') {
+						if ((iochar = getchar()) != '\n') {
+							putchar(iochar);
 							if (isDigit(iochar)) {
 								/* Convert the character representation of the right_operand to an integer */
 								while (isDigit(iochar)) {
 									right_operand = right_operand * 10 + (iochar - '0');
 									iochar = getchar();
-									putchar(iochar);
+
+									/* If we encounter a newline character immediately after the right operand, don't print it to the screen yet */
+									if (iochar != '\n') {
+										putchar(iochar);
+									}
 								}
 
 								/* Consume whitespaces following right_operand */
@@ -181,6 +186,11 @@ int main(void) {
 
 		/* Prompt user to repeat the program */
 		response = promptUserToRepeatProgram();
+
+		/* If the user decides to repeat the program, we must print the original prompt again */
+		if (response == 'Y' || response == 'y') {
+			printf("\nEnter an expression in the form of: A <operator> B\n");
+		}
 	}
 
 	return 0;
@@ -204,32 +214,32 @@ void performSpecifiedOperation(int left_operand, int right_operand, char operati
 
 	/* Determine which operation to perform */
 	switch (operation) {
-	case ADDITION:
-		result = addition(left_operand, right_operand);
-		break;
-	case SUBTRACTION:
-		result = subtraction(left_operand, right_operand);
-		break;
-	case MULTIPLICATION:
-		result = multiplication(left_operand, right_operand);
-		break;
-	case DIVISION:
-		result_float = division(left_operand, right_operand);
-		break;
-	case MODULO:
-		result = modulo(left_operand, right_operand);
-		break;
-	default:
-		printf("Error: Unable To Determine Operation Type\n");
-		break;
+		case ADDITION:
+			result = addition(left_operand, right_operand);
+			break;
+		case SUBTRACTION:
+			result = subtraction(left_operand, right_operand);
+			break;
+		case MULTIPLICATION:
+			result = multiplication(left_operand, right_operand);
+			break;
+		case DIVISION:
+			result_float = division(left_operand, right_operand);
+			break;
+		case MODULO:
+			result = modulo(left_operand, right_operand);
+			break;
+		default:
+			printf("Error: Unable To Determine Operation Type\n");
+			break;
 	}
 
 	/* Print the result */
 	if (operation == DIVISION) {
-		printf("Result: %f\n", result_float);
+		printf(" = %f\n", result_float);
 	}
 	else {
-		printf("Result: %d\n", result);
+		printf(" = %d\n", result);
 	}
 }
 
@@ -256,12 +266,13 @@ int modulo(int left_operand, int right_operand) {
 char promptUserToRepeatProgram(void) {
 	char response;
 	int isValid;
-	int c; // Variable to read any extra characters
+	int c; /* Variable to read any extra characters */
 
 	do {
-		isValid = 0; // Assume input is not valid initially
-		printf("Do you want to repeat the program? (y/n): ");
-		response = getchar(); // Read one character
+		isValid = 0; /* Assume input is not valid initially */
+		printf("\nDo you want to repeat the program? (Y/N): ");
+		response = getchar();
+		putchar(response);
 
 		if (response == 'y' || response == 'Y' || response == 'n' || response == 'N') {
 			if (getchar() == '\n') { // Check if next character is newline
@@ -272,8 +283,7 @@ char promptUserToRepeatProgram(void) {
 		while (!isValid && (c = getchar()) != '\n' && c != EOF) {
 			// Flush the input buffer until newline or EOF
 		}
-
-	} while (!isValid || response == 'y' || response == 'Y');
+	} while (!isValid);
 
 	return response;
 }
