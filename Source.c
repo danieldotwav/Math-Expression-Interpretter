@@ -98,7 +98,7 @@ int main(void) {
 								if (iochar == '\n' || iochar == EOF) {
 									/* Check for division by zero */
 									if ((operation == DIVISION || operation == MODULO) && right_operand == 0) {
-										printf("Error: Division By Zero\n");
+										printf("\nError: Division By Zero\n");
 									}
 									else {
 										/* If the only characters following the right_operand are tabs/spaces/newline characters/or EOF, then the expression is valid */
@@ -200,6 +200,7 @@ int main(void) {
 		}
 	}
 
+	printf("\nTerminating Program...\n");
 	return 0;
 }
 
@@ -272,25 +273,16 @@ int modulo(int left_operand, int right_operand) {
 
 char promptUserToRepeatProgram(void) {
 	char response;
-	int isValid;
-	int c; /* Variable to read any extra characters */
+	printf("\nDo you want to repeat the program? (Y/N): ");
 
-	do {
-		isValid = 0; /* Assume input is not valid initially */
+	while (scanf(" %c", &response) != 1 || (response != 'y' && response != 'Y' && response != 'n' && response != 'N')) {
+		// Clear the input buffer to remove unwanted characters
+		while (getchar() != '\n');
+
+		// Inform the user of the error
+		printf("Error: Invalid Input Detected\n");
 		printf("\nDo you want to repeat the program? (Y/N): ");
-		response = getchar();
-		putchar(response);
-
-		if (response == 'y' || response == 'Y' || response == 'n' || response == 'N') {
-			if (getchar() == '\n') { // Check if next character is newline
-				isValid = 1; // Input is valid
-			}
-		}
-
-		while (!isValid && (c = getchar()) != '\n' && c != EOF) {
-			// Flush the input buffer until newline or EOF
-		}
-	} while (!isValid);
+	}
 
 	return response;
 }
