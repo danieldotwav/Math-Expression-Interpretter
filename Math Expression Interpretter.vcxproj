@@ -130,13 +130,10 @@
     <ClCompile Include="Source.c" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="x64\Debug\input.txt">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </ExcludedFromBuild>
-    </Text>
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="README.md" />
+    <Text Include="x64\Debug\input.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

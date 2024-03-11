@@ -20,9 +20,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="x64\Debug\input.txt" />
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="README.md" />
+    <Text Include="x64\Debug\input.txt" />
   </ItemGroup>
 </Project>

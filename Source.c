@@ -27,7 +27,7 @@ int main(void) {
 	char response = 'Y';
 
 	printf("Welcome to the Math Expression Interpretter\n");
-	printf("Enter an expression in the form of: A <operator> B\n");
+	printf("\nEnter an expression in the form of: A <operator> B\n");
 
 	while (((iochar = getchar()) != EOF) && (response == 'Y' || response == 'y')) {
 		/* Reset operands */
@@ -63,8 +63,10 @@ int main(void) {
 				/* Once again, we check if we've reached the end of the line */
 				if (iochar != '\n') {
 					if (isValidOperatorSymbol(iochar)) {
-						/* Now that we have a valid operation, we need to process the right operand*/
+						/* Now that we have a valid operation, we need to get the next character */
 						operation = iochar;
+						iochar = getchar();
+						putchar(iochar);
 
 						/* Consume whitespaces following operator symbol */
 						while (isSpace(iochar)) {
@@ -73,8 +75,7 @@ int main(void) {
 						}
 
 						/* Check if we encounter a newline before reaching the right operand */
-						if ((iochar = getchar()) != '\n') {
-							putchar(iochar);
+						if (iochar != '\n') {
 							if (isDigit(iochar)) {
 								/* Convert the character representation of the right_operand to an integer */
 								while (isDigit(iochar)) {
@@ -95,8 +96,14 @@ int main(void) {
 
 								/* Final check for newline character */
 								if (iochar == '\n' || iochar == EOF) {
-									/* If the only characters following the right_operand are tabs/spaces/newline characters/or EOF, then the expression is valid */
-									performSpecifiedOperation(left_operand, right_operand, operation);
+									/* Check for division by zero */
+									if ((operation == DIVISION || operation == MODULO) && right_operand == 0) {
+										printf("Error: Division By Zero\n");
+									}
+									else {
+										/* If the only characters following the right_operand are tabs/spaces/newline characters/or EOF, then the expression is valid */
+										performSpecifiedOperation(left_operand, right_operand, operation);
+									}
 								}
 								else {
 									printf("Error: Invalid Expression Format\n");
@@ -189,7 +196,7 @@ int main(void) {
 
 		/* If the user decides to repeat the program, we must print the original prompt again */
 		if (response == 'Y' || response == 'y') {
-			printf("\nEnter an expression in the form of: A <operator> B\n");
+			printf("\n\nEnter an expression in the form of: A <operator> B\n");
 		}
 	}
 
@@ -256,7 +263,7 @@ int multiplication(int left_operand, int right_operand) {
 }
 
 float division(int left_operand, int right_operand) {
-	return left_operand / right_operand;
+	return (float)left_operand / right_operand;
 }
 
 int modulo(int left_operand, int right_operand) {
