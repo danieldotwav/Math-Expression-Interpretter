@@ -24,12 +24,12 @@ int main(void) {
 	int iochar;
 	int left_operand, right_operand, negative_sign_encountered, negative_number_encountered, count;
 	char operation;
-	char response = 'Y';
+	char repeat = 'Y';
 
 	printf("Welcome to the Math Expression Interpretter\n");
 	printf("\nEnter an expression in the form of: A <operator> B\n");
 
-	while (((iochar = getchar()) != EOF) && (response == 'Y' || response == 'y')) {
+	while (((iochar = getchar()) != EOF) && (repeat == 'Y' || repeat == 'y')) {
 		/* Reset operands */
 		left_operand = right_operand = negative_sign_encountered = negative_number_encountered = count = 0;
 		operation = '\0';
@@ -106,7 +106,7 @@ int main(void) {
 									}
 								}
 								else {
-									printf("Error: Invalid Expression Format\n");
+									printf("\nError: Invalid Expression Format\n");
 								}
 							}
 							else {
@@ -192,15 +192,16 @@ int main(void) {
 		}
 
 		/* Prompt user to repeat the program */
-		response = promptUserToRepeatProgram();
+		repeat = promptUserToRepeatProgram();
 
 		/* If the user decides to repeat the program, we must print the original prompt again */
-		if (response == 'Y' || response == 'y') {
+		if (repeat == 'Y' || repeat == 'y') {
 			printf("\n\nEnter an expression in the form of: A <operator> B\n");
+			while ((iochar = getchar()) != '\n' && iochar != EOF); /* Clear input buffer */
 		}
 	}
 
-	printf("\nTerminating Program...\n");
+	printf("\n\nTerminating Program...\n");
 	return 0;
 }
 
@@ -276,13 +277,17 @@ char promptUserToRepeatProgram(void) {
 	printf("\nDo you want to repeat the program? (Y/N): ");
 
 	while (scanf(" %c", &response) != 1 || (response != 'y' && response != 'Y' && response != 'n' && response != 'N')) {
-		// Clear the input buffer to remove unwanted characters
+		/* Print current character to console */
+		putchar(response);
+		
+		/* Clear the input buffer to remove unwanted characters */
 		while (getchar() != '\n');
 
-		// Inform the user of the error
-		printf("Error: Invalid Input Detected\n");
+		/* Inform the user of the error */
+		printf("\nError: Invalid Input Detected\n");
 		printf("\nDo you want to repeat the program? (Y/N): ");
 	}
 
+	putchar(response);
 	return response;
 }
